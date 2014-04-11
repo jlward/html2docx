@@ -45,28 +45,16 @@ class TemporaryDirectory(object):
         # use globals because they may be None'ed out at shutdown.
         for name in self._listdir(path):
             fullname = self._path_join(path, name)
-            try:
-                isdir = self._isdir(fullname)
-            except self._os_error:
-                isdir = False
-            if isdir:
-                self._rmtree(fullname)
-            else:
-                try:
-                    self._remove(fullname)
-                except self._os_error:
-                    pass
-        try:
-            self._rmdir(path)
-        except self._os_error:
-            pass
+            self._remove(fullname)
+        self._rmdir(path)
 
 
 def build_run(test_name, html):
     def run():
         with TemporaryDirectory() as tempdir:
             file_path = os.path.join(tempdir, 'test.docx')
-            HTML2Docx(html, file_path)
+            converter = HTML2Docx(html, file_path)
+            converter.convert()
         assert html == html
     run.description = test_name
     return run

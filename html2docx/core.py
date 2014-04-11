@@ -27,4 +27,5 @@ class HTML2Docx(object):
         Called by ``convert`` to actually build the real docx file, returns
         nothing.
         """
-        pass
+        with open(self.out_file, 'w') as f:
+            f.write('test')
