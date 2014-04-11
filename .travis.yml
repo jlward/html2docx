@@ -4,6 +4,8 @@ python:
   - "2.7"
   - "3.3"
 script: ./run_tests.sh
+install:
+  pip install -r test_requirements.txt
 notifications:
   email:
     - jason.louard.ward@gmail.com
