@@ -1,0 +1,9 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+script: ./run_tests.sh
+notifications:
+  email:
+    - jason.louard.ward@gmail.com
