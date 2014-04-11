@@ -1,5 +1,9 @@
 test_cases = [
     (
+        'Test blank.',
+        '',
+    ),
+    (
         'Test super simple.',
         '<p>AAA</p>',
     ),
