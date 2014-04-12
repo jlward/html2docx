@@ -1,6 +1,9 @@
 import os
 from tempfile import mkdtemp
 
+from pydocx.parsers.Docx2Html import Docx2Html
+from nose.tools import eq_
+
 from html2docx import HTML2Docx
 
 
@@ -49,12 +52,25 @@ class TemporaryDirectory(object):
         self._rmdir(path)
 
 
+class TestDocx2Html(Docx2Html):
+    def style(*args, **kwargs):
+        return ''
+
+    def head(*args, **kwargs):
+        return ''
+
+
 def build_run(test_name, html):
+    boiler_plate = '<html><body>%s</body></html>'
+    html = boiler_plate % html
+
     def run():
         with TemporaryDirectory() as tempdir:
             file_path = os.path.join(tempdir, 'test.docx')
             converter = HTML2Docx(html, file_path)
             converter.convert()
-        assert html == html
+            docx_converter = TestDocx2Html(file_path)
+            new_html = docx_converter.parsed
+        eq_(html, new_html)
     run.description = test_name
     return run
