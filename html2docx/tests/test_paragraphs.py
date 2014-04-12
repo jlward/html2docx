@@ -10,6 +10,10 @@ test_cases = [
         'Test super simple.',
         '<p>AAA</p>',
     ),
+    (
+        'Test multiple.',
+        '<p>AAA</p><p>BBB</p>',
+    ),
 ]
 
 
