@@ -1,3 +1,5 @@
+from xml.etree import cElementTree
+
 from jinja2 import Environment, PackageLoader
 
 from html2docx.utils import ZipFile
@@ -23,7 +25,9 @@ class HTML2Docx(object):
             'document_rels': 'word/_rels/document.xml.rels',
             'settings': 'word/settings.xml',
             'styles': 'word/styles.xml',
+            'p': 'elements/p.xml',
         }
+        self.document_state = []
 
     def convert(self):
         """
@@ -37,7 +41,12 @@ class HTML2Docx(object):
         Called by ``convert`` to get build the contents of the docx, returns
         nothing.
         """
-        pass
+        root = cElementTree.fromstring(self.html)
+        for el in root.getiterator():
+            if el.tag == 'p':
+                template_name = self.template_names['p']
+                t = self.env.get_template(template_name)
+                self.document_state.append(t.render(text=el.text))
 
     def _write_content_types(self, f):
         template_name = self.template_names['content_types']
@@ -62,7 +71,10 @@ class HTML2Docx(object):
     def _write_document(self, f):
         template_name = self.template_names['document']
         t = self.env.get_template(template_name)
-        f.writestr(template_name, t.render())
+        context = {
+            'body': ''.join(self.document_state),
+        }
+        f.writestr(template_name, t.render(**context))
 
     def _write_fonts(self, f):
         template_name = self.template_names['fonts']
