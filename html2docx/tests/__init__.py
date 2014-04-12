@@ -56,12 +56,9 @@ class TestDocx2Html(Docx2Html):
     def style(*args, **kwargs):
         return ''
 
-    def head(*args, **kwargs):
-        return ''
-
 
 def build_run(test_name, html):
-    boiler_plate = '<html><body>%s</body></html>'
+    boiler_plate = '<html><head></head><body>%s</body></html>'
     html = boiler_plate % html
 
     def run():
