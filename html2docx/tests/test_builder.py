@@ -40,3 +40,13 @@ class ParagraphParserTestCase(TestCase):
 
         expected_xml = '<w:p><w:r><w:rPr><w:b /></w:rPr><w:t>AAA</w:t></w:r></w:p>'  # noqa
         self.assertEqual(xml, expected_xml)
+
+    def test_complex(self):
+        html = '<p>a<strong>b<em>c</em>d</strong>e</p>'
+        element = cElementTree.fromstring(html)
+
+        parser = ParagraphParser(element)
+        xml = parser.tag.xml
+
+        expected_xml = '<w:p><w:r><w:rPr /><w:t>a</w:t></w:r><w:r><w:rPr><w:b /></w:rPr><w:t>b</w:t></w:r><w:r><w:rPr><w:b /><w:i /></w:rPr><w:t>c</w:t></w:r><w:r><w:rPr><w:b /></w:rPr><w:t>d</w:t></w:r><w:r><w:rPr /><w:t>e</w:t></w:r></w:p>'  # noqa
+        self.assertEqual(xml, expected_xml)

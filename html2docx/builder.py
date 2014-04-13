@@ -8,6 +8,11 @@ class BaseTag(object):
 
 
 class ParagraphParser(object):
+    html_to_ooxml_tag_conversions = {
+        'strong': 'bold',
+        'em': 'italics',
+    }
+
     def __init__(self, element):
         self.element = element
 
@@ -37,6 +42,10 @@ class ParagraphParser(object):
     def build_runs(self):
         for text, styles in self.parse(self.element):
             run = Run(text)
+            for style in styles:
+                ooxml_style = self.html_to_ooxml_tag_conversions.get(style)
+                if ooxml_style:
+                    setattr(run.properties, ooxml_style, True)
             if 'strong' in styles:
                 run.properties.bold = True
             if 'em' in styles:
