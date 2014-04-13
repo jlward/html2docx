@@ -7,6 +7,7 @@ from html2docx.builder import (
     RunProperties,
     TableCell,
     TableCellParser,
+    TableRow,
     TableRowParser,
 )
 
@@ -134,4 +135,13 @@ class TableRowParserTestCase(TestCase):
         xml = parser.tag.xml
         expected_xml = '<w:tr><w:tc><w:p><w:r><w:rPr /><w:t>AAA</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr /><w:t>BBB</w:t></w:r></w:p></w:tc></w:tr>'  # noqa
 
+        self.assertEqual(xml, expected_xml)
+
+
+class TableRowTestCase(TestCase):
+    def test_empty(self):
+        table_row = TableRow()
+        expected_xml = '<w:tr />'
+
+        xml = table_row.xml
         self.assertEqual(xml, expected_xml)

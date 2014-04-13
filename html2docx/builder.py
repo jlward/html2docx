@@ -132,6 +132,31 @@ class RunProperties(BaseTag):
             self._italics = False
 
 
+class TableRowParser(BaseParser):
+    @property
+    def tag(self):
+        table_cells = []
+        for table_row in self.element.findall('td'):
+            table_cells.append(TableCellParser(table_row))
+        return TableRow(table_cells)
+
+
+class TableRow(BaseTag):
+    tag_name = 'w:tr'
+
+    def __init__(self, table_cells=None):
+        self.table_cells = table_cells
+
+    @property
+    def tree(self):
+        element = cElementTree.Element(self.tag_name)
+        if self.table_cells is None:
+            return element
+        for table_cell in self.table_cells:
+            element.append(table_cell.tag.tree)
+        return element
+
+
 class TableCellParser(BaseParser):
     @property
     def tag(self):
