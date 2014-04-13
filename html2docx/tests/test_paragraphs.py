@@ -30,6 +30,10 @@ test_cases = [
         'Test partial em.',
         '<p>A<em>A</em>A</p>',
     ),
+    (
+        'Test mixed styles.',
+        '<p><strong><em>AAA</em></strong></p>',
+    ),
 ]
 
 
