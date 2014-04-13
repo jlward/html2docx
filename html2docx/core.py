@@ -3,7 +3,13 @@ from xml.etree import cElementTree
 from jinja2 import Environment, PackageLoader
 
 from html2docx.utils import ZipFile
-from html2docx.builder import ParagraphParser
+from html2docx.builder import ParagraphParser, TableParser
+
+
+tag_to_parser_conversions = {
+    'p': ParagraphParser,
+    'table': TableParser
+}
 
 
 class HTML2Docx(object):
@@ -47,8 +53,9 @@ class HTML2Docx(object):
             if el in self.visited:
                 continue
             self.visited.update([el])
-            if el.tag == 'p':
-                parser = ParagraphParser(el)
+            Parser = tag_to_parser_conversions.get(el.tag)
+            if Parser:
+                parser = Parser(el)
                 self.document_state.append(parser.tag)
                 self.visited.update(el.getiterator())
 
