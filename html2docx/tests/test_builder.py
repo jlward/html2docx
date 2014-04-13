@@ -1,7 +1,12 @@
 from xml.etree import cElementTree
 from unittest import TestCase
 
-from html2docx.builder import RunProperties, ParagraphParser, Paragraph
+from html2docx.builder import (
+    Paragraph,
+    ParagraphParser,
+    RunProperties,
+    TableCell,
+)
 
 
 class RunPropertiesTestCase(TestCase):
@@ -74,4 +79,13 @@ class ParagraphTestCase(TestCase):
         expected_xml = '<w:p />'
 
         xml = paragraph.xml
+        self.assertEqual(xml, expected_xml)
+
+
+class TableCellTestCase(TestCase):
+    def test_empty(self):
+        table_cell = TableCell()
+        expected_xml = '<w:tc />'
+
+        xml = table_cell.xml
         self.assertEqual(xml, expected_xml)
