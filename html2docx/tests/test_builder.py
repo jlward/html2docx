@@ -83,14 +83,7 @@ class ParagraphTestCase(TestCase):
         self.assertEqual(xml, expected_xml)
 
 
-class TableCellTestCase(TestCase):
-    def test_empty(self):
-        table_cell = TableCell()
-        expected_xml = '<w:tc />'
-
-        xml = table_cell.xml
-        self.assertEqual(xml, expected_xml)
-
+class TableCellParserTestCase(TestCase):
     def test_simple(self):
         element = cElementTree.fromstring('<td>AAA</td>')
         parser = TableCellParser(element)
@@ -105,4 +98,13 @@ class TableCellTestCase(TestCase):
         xml = parser.tag.xml
         expected_xml = '<w:tc><w:p><w:r><w:rPr><w:b /></w:rPr><w:t>AAA</w:t></w:r></w:p></w:tc>'  # noqa
 
+        self.assertEqual(xml, expected_xml)
+
+
+class TableCellTestCase(TestCase):
+    def test_empty(self):
+        table_cell = TableCell()
+        expected_xml = '<w:tc />'
+
+        xml = table_cell.xml
         self.assertEqual(xml, expected_xml)

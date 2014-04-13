@@ -7,11 +7,8 @@ class BaseTag(object):
         return cElementTree.tostring(self.tree)
 
 
-class ParagraphParser(object):
-    html_to_ooxml_tag_conversions = {
-        'strong': 'bold',
-        'em': 'italics',
-    }
+class BaseParser(object):
+    abstract = True
 
     def __init__(self, element):
         self.element = element
@@ -38,6 +35,13 @@ class ParagraphParser(object):
         styles.pop()
         if element.tail:
             yield element.tail, styles[-1]
+
+
+class ParagraphParser(BaseParser):
+    html_to_ooxml_tag_conversions = {
+        'strong': 'bold',
+        'em': 'italics',
+    }
 
     def build_runs(self):
         for text, styles in self.parse(self.element):
@@ -126,3 +130,25 @@ class RunProperties(BaseTag):
             self._italics = True
         else:
             self._italics = False
+
+
+class TableCellParser(BaseParser):
+    @property
+    def tag(self):
+        paragraph = ParagraphParser(self.element)
+        return TableCell(paragraph)
+
+
+class TableCell(BaseTag):
+    tag_name = 'w:tc'
+
+    def __init__(self, element=None):
+        self.element = element
+
+    @property
+    def tree(self):
+        element = cElementTree.Element(self.tag_name)
+        if self.element is None:
+            return element
+        element.append(self.element.tag.tree)
+        return element
