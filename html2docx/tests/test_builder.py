@@ -7,6 +7,7 @@ from html2docx.builder import (
     RunProperties,
     TableCell,
     TableCellParser,
+    TableRowParser,
 )
 
 
@@ -107,4 +108,30 @@ class TableCellTestCase(TestCase):
         expected_xml = '<w:tc />'
 
         xml = table_cell.xml
+        self.assertEqual(xml, expected_xml)
+
+
+class TableRowParserTestCase(TestCase):
+    def test_simple(self):
+        element = cElementTree.fromstring('<tr><td>AAA</td></tr>')
+        parser = TableRowParser(element)
+        xml = parser.tag.xml
+        expected_xml = '<w:tr><w:tc><w:p><w:r><w:rPr /><w:t>AAA</w:t></w:r></w:p></w:tc></w:tr>'  # noqa
+
+        self.assertEqual(xml, expected_xml)
+
+    def test_with_style(self):
+        element = cElementTree.fromstring('<tr><td><strong>AAA</strong></td></tr>')  # noqa
+        parser = TableRowParser(element)
+        xml = parser.tag.xml
+        expected_xml = '<w:tr><w:tc><w:p><w:r><w:rPr><w:b /></w:rPr><w:t>AAA</w:t></w:r></w:p></w:tc></w:tr>'  # noqa
+
+        self.assertEqual(xml, expected_xml)
+
+    def test_multiple_cells(self):
+        element = cElementTree.fromstring('<tr><td>AAA</td><td>BBB</td></tr>')
+        parser = TableRowParser(element)
+        xml = parser.tag.xml
+        expected_xml = '<w:tr><w:tc><w:p><w:r><w:rPr /><w:t>AAA</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:rPr /><w:t>BBB</w:t></w:r></w:p></w:tc></w:tr>'  # noqa
+
         self.assertEqual(xml, expected_xml)
