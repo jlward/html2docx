@@ -3,6 +3,7 @@ from xml.etree import cElementTree
 from jinja2 import Environment, PackageLoader
 
 from html2docx.utils import ZipFile
+from html2docx.builder import P
 
 
 class HTML2Docx(object):
@@ -28,6 +29,7 @@ class HTML2Docx(object):
             'p': 'elements/p.xml',
         }
         self.document_state = []
+        self.visited = set()
 
     def convert(self):
         """
@@ -43,10 +45,12 @@ class HTML2Docx(object):
         """
         root = cElementTree.fromstring(self.html)
         for el in root.getiterator():
+            if el in self.visited:
+                continue
+            self.visited.update([el])
             if el.tag == 'p':
-                template_name = self.template_names['p']
-                t = self.env.get_template(template_name)
-                self.document_state.append(t.render(text=el.text))
+                self.document_state.append(P(el))
+                self.visited.update(el.getiterator())
 
     def _write_content_types(self, f):
         template_name = self.template_names['content_types']
@@ -72,7 +76,7 @@ class HTML2Docx(object):
         template_name = self.template_names['document']
         t = self.env.get_template(template_name)
         context = {
-            'body': ''.join(self.document_state),
+            'body': ''.join(s.text for s in self.document_state),
         }
         f.writestr(template_name, t.render(**context))
 
