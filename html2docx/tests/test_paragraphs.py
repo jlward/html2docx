@@ -14,6 +14,26 @@ test_cases = [
         'Test multiple.',
         '<p>AAA</p><p>BBB</p>',
     ),
+    (
+        'Test bold.',
+        '<p><strong>AAA</strong></p>',
+    ),
+    (
+        'Test partial bold.',
+        '<p>A<strong>A</strong>A</p>',
+    ),
+    (
+        'Test em.',
+        '<p><em>AAA</em></p>',
+    ),
+    (
+        'Test partial em.',
+        '<p>A<em>A</em>A</p>',
+    ),
+    (
+        'Test mixed styles.',
+        '<p><strong><em>AAA</em></strong></p>',
+    ),
 ]
 
 

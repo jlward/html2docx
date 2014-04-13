@@ -1,1 +1,1 @@
-<w:p><w:pPr><w:pStyle w:val="style0"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr><w:t>{{ text }}</w:t></w:r></w:p>
+<w:p><w:pPr><w:pStyle w:val="style0"/><w:rPr></w:rPr></w:pPr>{% for run in runs %}{{ run.text }}{% endfor %}</w:p>
