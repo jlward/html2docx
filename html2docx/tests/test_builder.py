@@ -6,6 +6,7 @@ from html2docx.builder import (
     ParagraphParser,
     RunProperties,
     TableCell,
+    TableCellParser,
 )
 
 
@@ -88,4 +89,20 @@ class TableCellTestCase(TestCase):
         expected_xml = '<w:tc />'
 
         xml = table_cell.xml
+        self.assertEqual(xml, expected_xml)
+
+    def test_simple(self):
+        element = cElementTree.fromstring('<td>AAA</td>')
+        parser = TableCellParser(element)
+        xml = parser.tag.xml
+        expected_xml = '<w:tc><w:p><w:r><w:rPr /><w:t>AAA</w:t></w:r></w:p></w:tc>'  # noqa
+
+        self.assertEqual(xml, expected_xml)
+
+    def test_with_style(self):
+        element = cElementTree.fromstring('<td><strong>AAA</strong></td>')
+        parser = TableCellParser(element)
+        xml = parser.tag.xml
+        expected_xml = '<w:tc><w:p><w:r><w:rPr><w:b /></w:rPr><w:t>AAA</w:t></w:r></w:p></w:tc>'  # noqa
+
         self.assertEqual(xml, expected_xml)
