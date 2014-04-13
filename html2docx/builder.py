@@ -46,10 +46,6 @@ class ParagraphParser(object):
                 ooxml_style = self.html_to_ooxml_tag_conversions.get(style)
                 if ooxml_style:
                     setattr(run.properties, ooxml_style, True)
-            if 'strong' in styles:
-                run.properties.bold = True
-            if 'em' in styles:
-                run.properties.italics = True
             yield run
 
     @property
