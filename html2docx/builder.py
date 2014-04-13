@@ -1,66 +1,4 @@
 from xml.etree import cElementTree
-from jinja2 import Environment, PackageLoader
-
-
-class Element(object):
-    abstract = True
-    env = Environment(loader=PackageLoader('html2docx', 'templates'))
-
-    def __init__(self, element):
-        # The HTML element that has all the info needed to generate this type
-        # of tag.
-        self.element = element
-
-    def get_template(self):
-        return self.env.get_template(self.template_name)
-
-    def styled_tag(self, element, style):
-        tag = R(element.text)
-        setattr(tag, style, True)
-        print dir(element), element.getchildren()
-        yield tag
-        yield R(element.tail)
-
-    def iter_children(self):
-        tags = []
-        conversions = {
-            'strong': 'bold',
-            'em': 'italics',
-        }
-        for el in self.element.getiterator():
-            if el.tag in conversions:
-                tags.extend(self.styled_tag(el, conversions[el.tag]))
-        return tags
-
-
-class P(Element):
-    template_name = 'elements/p.xml'
-
-    @property
-    def text(self):
-        t = self.get_template()
-        runs = [
-            R(self.element.text)
-        ]
-        runs += self.iter_children()
-        runs += [R(self.element.tail)]
-
-        return t.render(runs=runs)
-
-
-class R(Element):
-    template_name = 'elements/r.xml'
-
-    def __init__(self, text=None, element=None, *args, **kwargs):
-        self._text = text
-        self.element = element
-
-    @property
-    def text(self):
-        if not self._text:
-            return ''
-        t = self.get_template()
-        return t.render(run=self)
 
 
 class BaseTag(object):
@@ -69,20 +7,9 @@ class BaseTag(object):
         return cElementTree.tostring(self.tree)
 
 
-class Paragraph(BaseTag):
-    tag_name = 'w:p'
-
+class ParagraphParser(object):
     def __init__(self, element):
         self.element = element
-        self.runs = []
-        for text, styles in self.parse(self.element):
-            normalized_styles = {}
-            if 'strong' in styles:
-                normalized_styles['bold'] = True
-            if 'em' in styles:
-                normalized_styles['italics'] = True
-            run_property = RunProperties(**normalized_styles)
-            self.runs.append(Run(text, run_property))
 
     def parse(self, element):
         styles = [{}]
@@ -107,6 +34,28 @@ class Paragraph(BaseTag):
         if element.tail:
             yield element.tail, styles[-1]
 
+    def build_runs(self):
+        for text, styles in self.parse(self.element):
+            run = Run(text)
+            if 'strong' in styles:
+                run.properties.bold = True
+            if 'em' in styles:
+                run.properties.italics = True
+            yield run
+
+    @property
+    def tag(self):
+        return Paragraph(self.build_runs())
+
+
+class Paragraph(BaseTag):
+    tag_name = 'w:p'
+
+    def __init__(self, runs=None):
+        if runs is None:
+            runs = []
+        self.runs = runs
+
     @property
     def tree(self):
         element = cElementTree.Element(self.tag_name)
@@ -118,14 +67,14 @@ class Paragraph(BaseTag):
 class Run(BaseTag):
     tag_name = 'w:r'
 
-    def __init__(self, text, run_property):
+    def __init__(self, text):
         self.text = text
-        self.run_property = run_property
+        self.properties = RunProperties()
 
     @property
     def tree(self):
         element = cElementTree.Element(self.tag_name)
-        element.append(self.run_property.tree)
+        element.append(self.properties.tree)
         text = cElementTree.SubElement(element, 'w:t')
         text.text = self.text
         return element

@@ -3,7 +3,7 @@ from xml.etree import cElementTree
 from jinja2 import Environment, PackageLoader
 
 from html2docx.utils import ZipFile
-from html2docx.builder import Paragraph
+from html2docx.builder import ParagraphParser
 
 
 class HTML2Docx(object):
@@ -48,7 +48,8 @@ class HTML2Docx(object):
                 continue
             self.visited.update([el])
             if el.tag == 'p':
-                self.document_state.append(Paragraph(el))
+                parser = ParagraphParser(el)
+                self.document_state.append(parser.tag)
                 self.visited.update(el.getiterator())
 
     def _write_content_types(self, f):
